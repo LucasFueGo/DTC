@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  /* --- COULEURS DE BASE --- */
+  /* Fond de page blanc cassé très subtil pour moins fatiguer les yeux */
+  --color-background: #ffffff;
+  /* Texte principal : Presque noir, mais avec une teinte bleue (Slate 950) */
+  --color-foreground: #020817;
+
+  /* --- PRIMAIRE (Tes boutons principaux) --- */
+  /* Un bleu nuit très profond et professionnel (Slate 900) */
+  /* C'est ce qui remplacera le bleu manuel pour un look plus "corporate" */
+  --color-primary: #0f172a; 
+  --color-primary-foreground: #f8fafc; /* Texte blanc sur le bouton */
+
+  /* --- SECONDAIRE --- */
+  /* Pour les fonds gris légers et boutons secondaires */
+  --color-secondary: #f1f5f9; /* Slate 100 */
+  --color-secondary-foreground: #0f172a;
+
+  /* --- ACCENT & MUTED (Pour les hovers et textes gris) --- */
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b; /* Slate 500 - Texte gris pro */
+  --color-accent: #f1f5f9;
+  --color-accent-foreground: #0f172a;
+
+  /* --- DESTRUCTIVE (Erreurs / Supprimer) --- */
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+
+  /* --- BORDURES & INPUTS --- */
+  /* Indispensable pour que tes inputs et cartes soient propres */
+  --color-border: #e2e8f0; /* Slate 200 */
+  --color-input: #e2e8f0;
+  --color-ring: #0f172a; /* Le contour quand on clique sur un input */
+}
+
+/* Ajout pour lisser les polices (rendu plus pro) */
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}

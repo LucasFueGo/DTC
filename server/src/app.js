@@ -1,0 +1,48 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import authRoutes from './routes/authRoutes.js';
+
+dotenv.config();
+
+const app = express();
+
+const allowedOrigins = [
+    process.env.ORIGIN,                      
+    'https://bank-drab-seven.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:3000'
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        const cleanOrigin = origin.replace(/\/$/, "");
+        const isAllowed = allowedOrigins.some(o => o && o.replace(/\/$/, "") === cleanOrigin);
+
+        if (isAllowed) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+app.get('/ping', async (req, res) => {
+    try {
+        await prisma.$queryRaw`SELECT 1`;
+        res.status(200).send('pong & db alive');
+    } catch (error) {
+        res.status(200).send('pong (db error)'); 
+    }
+});
+
+app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes);
+
+export default app;
