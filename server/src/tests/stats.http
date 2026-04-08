@@ -1,0 +1,21 @@
+### 
+# @name login
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+    "name": "Test",
+    "password": "MonMotDePasseSecret123!"
+}
+
+### 
+@authToken = {{login.response.body.token}}
+
+### playTime
+GET http://localhost:3000/api/stats/playTime
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    
+}
