@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { authService } from "../controller/authService"; // Vérifie bien le chemin
+import { authService } from "../controller/authService";
 
 const Context = React.createContext(null);
 
