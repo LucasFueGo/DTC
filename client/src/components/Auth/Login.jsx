@@ -1,26 +1,11 @@
-import React, { useState } from 'react';
-import { useContext } from 'react';
-import { Context } from '@/context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
 
 const Login = () => {
-    const { login } = useContext(Context);
-    const navigate = useNavigate();
-
-    const [name, setName] = useState('');
-    const [password, setPaswword] = useState('');
-
-    const handleSubmit = async(e) => {
-        e.preventDefault();
-
-        const success = await login(name, password);
-
-        if (success) {
-            navigate('/');
-        }
-    };
+    const clientId = import.meta.env.VITE_BUNGIE_CLIENT_ID || 'TON_CLIENT_ID_ICI'; 
+    
+    const loginUrl = `https://www.bungie.net/en/OAuth/Authorize?client_id=${clientId}&response_type=code`;
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
@@ -28,43 +13,20 @@ const Login = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100"
+                className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-8 space-y-8 text-center"
             >
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Login</h1>
+                <div className="space-y-2">
+                    <h1 className="text-3xl font-bold text-gray-900">Bienvenue Gardien</h1>
+                    <p className="text-gray-500 text-sm">
+                        Connecte-toi avec ton compte Bungie pour accéder à tes statistiques complètes.
+                    </p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 ml-1">
-                            Name
-                        </label>
-                        <input 
-                            type="name"
-                            required
-                            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm font-medium text-gray-700 ml-1">
-                            Password
-                        </label>
-                        <input 
-                            type="password"
-                            required
-                            className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                            value={password}
-                            onChange={(e) => setPaswword(e.target.value)}
-                        />
-                    </div>
-
-                    <Button type="submit" className="w-full py-6 text-lg">
-                        Se connecter
+                <a href={loginUrl} className="block w-full">
+                    <Button className="w-full py-6 text-lg font-semibold transition-transform hover:scale-105">
+                        Se connecter à Bungie
                     </Button>
-                </form>
+                </a>
             </motion.div>
         </div>
     );
