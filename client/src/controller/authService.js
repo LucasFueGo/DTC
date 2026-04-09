@@ -1,22 +1,12 @@
 import apiClient from './apiClient';
 
 export const authService = {
-    login: async (name, password) => {
+    exchangeBungieToken: async (code) => {
         try {
-            const response = await apiClient.post('auth/login', { name, password });
+            const response = await apiClient.post('auth/exchangeToken', { code });
             return response.data;
         } catch (error) {
-            throw error.response?.data || { error: "Erreur de connexion" };
-        }
-    },
-
-    getme: async (name, password) => {
-        try {
-            const response = await apiClient.get('auth/me');
-            console.log(response)
-            return response;
-        } catch (error) {
-            throw error.response?.data || { error: "Erreur de connexion" };
+            throw error.response?.data || { error: "Erreur lors de l'échange du jeton avec Bungie" };
         }
     }
 };

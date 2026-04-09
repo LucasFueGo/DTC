@@ -1,9 +1,4 @@
-import prisma from '../config/db.js';
-
 export const D1PlayTime = async (req, res) => {
-    // const userId = req.user.userId;
-    // const { name } = req.body;
-
     const API_KEY = process.env.BUNGIE_API_KEY.trim();
     const { membership_id, membership_type } = req.body; 
 
@@ -70,9 +65,6 @@ export const D1PlayTime = async (req, res) => {
 };
 
 export const D2PlayTime = async (req, res) => {
-    // const userId = req.user.userId;
-    // const { name } = req.body;
-
     const { membership_id, membership_type } = req.body;
     const API_KEY = process.env.BUNGIE_API_KEY.trim();
 

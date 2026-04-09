@@ -10,9 +10,11 @@ const app = express();
 
 const allowedOrigins = [
     process.env.ORIGIN,                      
-    'https://bank-drab-seven.vercel.app',
+    'https://dtc-seven.vercel.app/Auth',
     'http://localhost:5173',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://localhost:5173',
+    'https://localhost:3000'
 ];
 
 app.use(cors({
