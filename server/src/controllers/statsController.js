@@ -4,12 +4,15 @@ export const D1PlayTime = async (req, res) => {
     // const userId = req.user.userId;
     // const { name } = req.body;
 
-    const API_KEY = process.env.BUNGIE_API_KEY.replace(/['"]/g, '').trim();
-    const MEMBERSHIP_TYPE = process.env.MEMBERSHIP_TYPE.replace(/['"]/g, '').trim();
-    const MEMBERSHIP_ID = process.env.MEMBERSHIP_ID.replace(/['"]/g, '').trim();
+    const API_KEY = process.env.BUNGIE_API_KEY.trim();
+    const { membership_id, membership_type } = req.body; 
+
+    if (!membership_id || !membership_type) {
+        return res.status(400).json({ error: "membership_id et membership_type sont requis." });
+    }
 
     try {
-        const baseUrl = `https://www.bungie.net/Platform/Destiny/${MEMBERSHIP_TYPE}/Account/${MEMBERSHIP_ID}/Summary/`;
+        const baseUrl = `https://www.bungie.net/Platform/Destiny/${membership_type}/Account/${membership_id}/Summary/`;
         const url = new URL(baseUrl);
 
         const response = await fetch(url.toString(), {
@@ -70,14 +73,15 @@ export const D2PlayTime = async (req, res) => {
     // const userId = req.user.userId;
     // const { name } = req.body;
 
+    const { membership_id, membership_type } = req.body;
     const API_KEY = process.env.BUNGIE_API_KEY.trim();
-    const MEMBERSHIP_TYPE = process.env.MEMBERSHIP_TYPE.trim();
-    const MEMBERSHIP_ID = process.env.MEMBERSHIP_ID.trim();
+
+    if (!membership_id || !membership_type) {
+        return res.status(400).json({ error: "membership_id et membership_type sont requis." });
+    }
 
     try {
-        const url = `https://www.bungie.net/Platform/Destiny2/${MEMBERSHIP_TYPE}/Profile/${MEMBERSHIP_ID}/?components=200`;
-
-        console.log("URL envoyée à Bungie :", url);
+        const url = `https://www.bungie.net/Platform/Destiny2/${membership_type}/Profile/${membership_id}/?components=200`;
 
         const response = await fetch(url, {
             headers: {

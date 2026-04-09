@@ -8,8 +8,8 @@ import { authenticateToken } from '../middleware/authMiddleware.js';
 const router = express.Router();
 router.use(authenticateToken);
 
-router.get('/D1PlayTime', D1PlayTime);
-router.get('/D2PlayTime', D2PlayTime);
+router.post('/D1PlayTime', D1PlayTime);
+router.post('/D2PlayTime', D2PlayTime);
 
 
 export default router;
