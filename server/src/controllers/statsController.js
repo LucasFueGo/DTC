@@ -65,7 +65,7 @@ export const D1PlayTime = async (req, res) => {
 };
 
 export const D2PlayTime = async (req, res) => {
-    const { membership_id, membership_type } = req.body;
+    const { membership_id, membership_type,token } = req.body;
     const API_KEY = process.env.BUNGIE_API_KEY.trim();
 
     if (!membership_id || !membership_type) {
@@ -73,12 +73,17 @@ export const D2PlayTime = async (req, res) => {
     }
 
     try {
-        const url = `https://www.bungie.net/Platform/Destiny2/${membership_type}/Profile/${membership_id}/?components=200`;
+        const url = `https://www.bungie.net/Platform/Destiny2/${membership_type}/Profile/${membership_id}/?components=200,900`;
+
+        const requestHeaders = {
+            'X-API-Key': API_KEY
+        };
+        if (token) {
+            requestHeaders['Authorization'] = `Bearer ${token}`;
+        }
 
         const response = await fetch(url, {
-            headers: {
-                'X-API-Key': API_KEY
-            }
+            headers: requestHeaders
         });
 
         const data = await response.json();
@@ -86,6 +91,9 @@ export const D2PlayTime = async (req, res) => {
         if (data.ErrorCode !== 1) {
             return res.status(400).json({ error: data.Message });
         }
+
+        const activeTriumphScore = data.Response.profileRecords?.data?.activeScore || 0;
+        const lifetimeTriumphScore = data.Response.profileRecords?.data?.lifetimeScore || 0;
 
         const classNames = {
             0: "Titan",
@@ -119,7 +127,9 @@ export const D2PlayTime = async (req, res) => {
                 totalMinutes: totalAccountMinutes,
                 totalHours: Math.floor(totalAccountMinutes / 60)
             },
-            characters: formattedCharacters
+            characters: formattedCharacters,
+            triumphScore: activeTriumphScore,
+            lifetimeScore: lifetimeTriumphScore
         });
 
     } catch (error) {

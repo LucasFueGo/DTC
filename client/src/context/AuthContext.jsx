@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { authService } from "../controller/authService";
+import { authService } from "../services/authService";
 
 const Context = React.createContext(null);
 
@@ -32,12 +32,15 @@ const ProviderWrapper = (props) => {
             
             if (data.accessToken) {
                 localStorage.setItem('bungie_access_token', data.accessToken);
-                localStorage.setItem('bungie_refresh_token', data.refreshToken);
-                localStorage.setItem('bungie_membership_id', data.membershipId);
+                localStorage.setItem('destiny_membership_id', data.destinyMembershipId);
+                localStorage.setItem('membership_type', data.membershipType);
+                localStorage.setItem('display_name', data.displayName);
                 
                 setUser({ 
                     token: data.accessToken, 
-                    membershipId: data.membershipId 
+                    destinyId: data.destinyMembershipId,
+                    type: data.membershipType,
+                    name: data.displayName
                 });
                 return true;
             }
