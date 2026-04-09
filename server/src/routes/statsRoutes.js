@@ -1,13 +1,15 @@
 import express from 'express';
 import { 
-    playTime
+    D2PlayTime,
+    D1PlayTime
 } from '../controllers/statsController.js';
 import { authenticateToken } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 router.use(authenticateToken);
 
+router.get('/D1PlayTime', D1PlayTime);
+router.get('/D2PlayTime', D2PlayTime);
 
-router.get('/playTime', playTime);
 
 export default router;

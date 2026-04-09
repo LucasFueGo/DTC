@@ -11,8 +11,17 @@ Content-Type: application/json
 ### 
 @authToken = {{login.response.body.token}}
 
-### playTime
-GET http://localhost:3000/api/stats/playTime
+### D1PlayTime
+GET http://localhost:3000/api/stats/D1PlayTime
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+
+}
+
+### D2PlayTime
+GET http://localhost:3000/api/stats/D2PlayTime
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
