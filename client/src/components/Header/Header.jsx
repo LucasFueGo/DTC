@@ -2,15 +2,16 @@ import { useContext } from 'react';
 import { Context } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/Button';
-import { LogOut, Users } from 'lucide-react';
+import { LogOut, Users, SearchIcon} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 function Header() {
     const { logout } = useContext(Context);
 
-    // const menuItems = [
-    //     { label: "Dashboard", icon: Users, href: "/" }
-    // ];
+    const menuItems = [
+        { label: "Dashboard", icon: Users, href: "/" },
+        { label: "Search", icon: SearchIcon, href: "search" }
+    ];
 
     return (
         <header className="sticky top-0 z-50 border-b border-dtc-surface bg-dtc-bg/80 backdrop-blur-md">
@@ -27,7 +28,7 @@ function Header() {
                         </h1>
                     </motion.div>
 
-                    {/* <nav className="flex items-center gap-4 sm:gap-6">
+                    <nav className="flex items-center gap-4 sm:gap-6">
                         {menuItems.map((item, index) => (
                             <Link
                                 key={index}
@@ -38,7 +39,7 @@ function Header() {
                                 <span className="hidden xs:inline">{item.label}</span>
                             </Link>
                         ))}
-                    </nav> */}
+                    </nav>
 
                     <div className="flex items-center gap-2">
                         <Button 

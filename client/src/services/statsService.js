@@ -20,5 +20,14 @@ export const statsService = {
             token: token
         });
         return response.data;
+    },
+
+    searchPlayer: async (bungieName) => {
+        try {
+            const response = await apiClient.post('stats/search', { bungieName });
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { error: "Joueur introuvable" };
+        }
     }
 };
