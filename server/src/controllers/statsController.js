@@ -19,8 +19,14 @@ export const D1PlayTime = async (req, res) => {
         const data = await response.json();
         
         if (data.ErrorCode !== 1) {
-            console.error("Bungie a renvoyé une erreur :", data);
-            return res.status(400).json(data);
+            console.warn(`Info D1 ignorée (Code ${data.ErrorCode}) pour le joueur ${membership_id}`);
+            return res.json({
+                global: {
+                    totalMinutes: 0,
+                    totalHours: 0
+                },
+                characters: []
+            });
         }
 
         const classNames = {
@@ -65,7 +71,7 @@ export const D1PlayTime = async (req, res) => {
 };
 
 export const D2PlayTime = async (req, res) => {
-    const { membership_id, membership_type } = req.body;
+    const { membership_id, membership_type,token } = req.body;
     const API_KEY = process.env.BUNGIE_API_KEY.trim();
 
     if (!membership_id || !membership_type) {
@@ -73,12 +79,17 @@ export const D2PlayTime = async (req, res) => {
     }
 
     try {
-        const url = `https://www.bungie.net/Platform/Destiny2/${membership_type}/Profile/${membership_id}/?components=200`;
+        const url = `https://www.bungie.net/Platform/Destiny2/${membership_type}/Profile/${membership_id}/?components=200,900`;
+
+        const requestHeaders = {
+            'X-API-Key': API_KEY
+        };
+        if (token) {
+            requestHeaders['Authorization'] = `Bearer ${token}`;
+        }
 
         const response = await fetch(url, {
-            headers: {
-                'X-API-Key': API_KEY
-            }
+            headers: requestHeaders
         });
 
         const data = await response.json();
@@ -86,6 +97,9 @@ export const D2PlayTime = async (req, res) => {
         if (data.ErrorCode !== 1) {
             return res.status(400).json({ error: data.Message });
         }
+
+        const activeTriumphScore = data.Response.profileRecords?.data?.activeScore || 0;
+        const lifetimeTriumphScore = data.Response.profileRecords?.data?.lifetimeScore || 0;
 
         const classNames = {
             0: "Titan",
@@ -119,10 +133,78 @@ export const D2PlayTime = async (req, res) => {
                 totalMinutes: totalAccountMinutes,
                 totalHours: Math.floor(totalAccountMinutes / 60)
             },
-            characters: formattedCharacters
+            characters: formattedCharacters,
+            triumphScore: activeTriumphScore,
+            lifetimeScore: lifetimeTriumphScore
         });
 
     } catch (error) {
         res.status(500).json({ error: "Erreur lors de la communication avec Bungie" });
+    }
+};
+
+export const searchPlayer = async (req, res) => {
+    const { bungieName } = req.body; 
+    const API_KEY = process.env.BUNGIE_API_KEY.trim();
+
+    if (!bungieName || !bungieName.includes('#')) {
+        return res.status(400).json({ error: "Le pseudo doit inclure le '#' et les chiffres." });
+    }
+
+    const [displayName, codeString] = bungieName.split('#');
+    const displayNameCode = parseInt(codeString, 10);
+
+    try {
+        const url = `https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayerByBungieName/-1/`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ displayName: displayName, displayNameCode: displayNameCode })
+        });
+        const data = await response.json();
+
+        if (data.ErrorCode !== 1 || !data.Response || data.Response.length === 0) {
+            return res.status(404).json({ error: "Aucun Gardien trouvé." });
+        }
+
+        const player = data.Response[0];
+        res.json({
+            destinyMembershipId: player.membershipId,
+            membershipType: player.membershipType,
+            displayName: player.bungieGlobalDisplayName || player.displayName
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Erreur lors de la recherche" });
+    }
+};
+
+export const autocompletePlayer = async (req, res) => {
+    const { prefix } = req.body;
+    const API_KEY = process.env.BUNGIE_API_KEY.trim();
+
+    if (!prefix || prefix.length < 3) return res.json([]); 
+
+    try {
+        const url = `https://www.bungie.net/Platform/User/Search/GlobalName/0/`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ displayNamePrefix: prefix })
+        });
+        const data = await response.json();
+
+        if (data.ErrorCode !== 1) return res.status(400).json({ error: data.Message });
+
+        const suggestions = data.Response.searchResults.map(user => {
+            const code = String(user.bungieGlobalDisplayNameCode).padStart(4, '0');
+            return {
+                displayName: user.bungieGlobalDisplayName,
+                code: code,
+                fullName: `${user.bungieGlobalDisplayName}#${code}`,
+            };
+        });
+        res.json(suggestions.slice(0, 5));
+    } catch (error) {
+        res.status(500).json({ error: "Erreur serveur" });
     }
 };
