@@ -27,7 +27,16 @@ export const statsService = {
             const response = await apiClient.post('stats/search', { bungieName });
             return response.data;
         } catch (error) {
-            throw error.response?.data || { error: "Joueur introuvable" };
+            throw error.response?.data || { error: "Erreur de recherche" };
+        }
+    },
+
+    autocomplete: async (prefix) => {
+        try {
+            const response = await apiClient.post('stats/autocomplete', { prefix });
+            return response.data;
+        } catch (error) {
+            return [];
         }
     }
 };

@@ -143,13 +143,12 @@ export const D2PlayTime = async (req, res) => {
     }
 };
 
-
 export const searchPlayer = async (req, res) => {
     const { bungieName } = req.body; 
     const API_KEY = process.env.BUNGIE_API_KEY.trim();
 
     if (!bungieName || !bungieName.includes('#')) {
-        return res.status(400).json({ error: "Le pseudo doit inclure le '#' et les chiffres (ex: Gardien#1234)." });
+        return res.status(400).json({ error: "Le pseudo doit inclure le '#' et les chiffres." });
     }
 
     const [displayName, codeString] = bungieName.split('#');
@@ -157,35 +156,55 @@ export const searchPlayer = async (req, res) => {
 
     try {
         const url = `https://www.bungie.net/Platform/Destiny2/SearchDestinyPlayerByBungieName/-1/`;
-
         const response = await fetch(url, {
             method: 'POST',
-            headers: {
-                'X-API-Key': API_KEY,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                displayName: displayName,
-                displayNameCode: displayNameCode
-            })
+            headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ displayName: displayName, displayNameCode: displayNameCode })
         });
-
         const data = await response.json();
 
         if (data.ErrorCode !== 1 || !data.Response || data.Response.length === 0) {
-            return res.status(404).json({ error: "Aucun Gardien trouvé avec ce nom." });
+            return res.status(404).json({ error: "Aucun Gardien trouvé." });
         }
 
         const player = data.Response[0];
-
         res.json({
             destinyMembershipId: player.membershipId,
             membershipType: player.membershipType,
             displayName: player.bungieGlobalDisplayName || player.displayName
         });
-
     } catch (error) {
-        console.error("Erreur de recherche :", error);
-        res.status(500).json({ error: "Erreur lors de la recherche du joueur." });
+        res.status(500).json({ error: "Erreur lors de la recherche" });
+    }
+};
+
+export const autocompletePlayer = async (req, res) => {
+    const { prefix } = req.body;
+    const API_KEY = process.env.BUNGIE_API_KEY.trim();
+
+    if (!prefix || prefix.length < 3) return res.json([]); 
+
+    try {
+        const url = `https://www.bungie.net/Platform/User/Search/GlobalName/0/`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ displayNamePrefix: prefix })
+        });
+        const data = await response.json();
+
+        if (data.ErrorCode !== 1) return res.status(400).json({ error: data.Message });
+
+        const suggestions = data.Response.searchResults.map(user => {
+            const code = String(user.bungieGlobalDisplayNameCode).padStart(4, '0');
+            return {
+                displayName: user.bungieGlobalDisplayName,
+                code: code,
+                fullName: `${user.bungieGlobalDisplayName}#${code}`,
+            };
+        });
+        res.json(suggestions.slice(0, 5));
+    } catch (error) {
+        res.status(500).json({ error: "Erreur serveur" });
     }
 };
