@@ -12,7 +12,13 @@ const CharacterCard = ({ character, membershipId, membershipType, delay = 0 }) =
 
     const handleClick = () => {
         if (membershipId && membershipType) {
-            navigate(`/character/${membershipType}/${membershipId}/${character.characterId}`);
+            navigate(`/character/${membershipType}/${membershipId}/${character.characterId}`, {
+                state: {
+                    className: character.className,
+                    emblemImage: character.emblemImage,
+                    lightLevel: character.lightLevel,
+                }
+            });
         }
     };
 
