@@ -1,23 +1,19 @@
 import { useState, useEffect } from 'react';
 import { statsService } from '@/services/statsService';
 import Layout from '@/components/Layout/Layout';
+
 import { Button } from '@/components/ui/Button';
 import { SearchIcon, Loader2, AlertCircle, Shield, Swords, Clock } from 'lucide-react';
+import { useSearch } from '@/context/SearchContext';
 
 import PlayerStatsBoard  from '@/components/Dashboard/PlayerStatsBoard';
 
 function Search() {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const { searchQuery, setSearchQuery, playerInfo, d1Data, d2Data, isLoading, error, handleSearch } = useSearch();
 
     const [suggestions, setSuggestions] = useState([]);
     const [isTyping, setIsTyping] = useState(false);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [playerInfo, setPlayerInfo] = useState(null);
-    const [d1Data, setD1Data] = useState(null);
-    const [d2Data, setD2Data] = useState(null);
-    const [activeTab, setActiveTab] = useState('D2');
 
 
     useEffect(() => {
@@ -53,38 +49,10 @@ function Search() {
         return () => clearTimeout(timeoutId);
     }, [searchQuery]);
 
-   const handleSearch = async (targetQuery = searchQuery) => {
-        if (!targetQuery || !targetQuery.includes('#')) {
-            setError("Le pseudo doit inclure le '#' et les chiffres (ex: Gardien#1234).");
-            return;
-        }
-
-        setIsLoading(true);
-        setError(null);
-        setPlayerInfo(null);
+    const search = (targetQuery) => {
         setShowSuggestions(false);
-        setSearchQuery(targetQuery);
-
-        try {
-            const targetPlayer = await statsService.searchPlayer(targetQuery);
-            setPlayerInfo(targetPlayer);
-
-            const [resD1, resD2] = await Promise.all([
-                statsService.getD1Stats(targetPlayer.destinyMembershipId, targetPlayer.membershipType),
-                statsService.getD2Stats(targetPlayer.destinyMembershipId, targetPlayer.membershipType, null)
-            ]);
-
-            setD1Data(resD1);
-            setD2Data(resD2);
-        } catch (err) {
-            setError(err.error || "Une erreur est survenue.");
-        } finally {
-            setIsLoading(false);
-        }
+        handleSearch(targetQuery);
     };
-
-    const combinedHours = (d1Data?.global?.totalHours || 0) + (d2Data?.global?.totalHours || 0);
-    const activeCharacters = activeTab === 'D2' ? (d2Data?.characters || []) : (d1Data?.characters || []);
 
     return (
         <Layout>
@@ -94,7 +62,7 @@ function Search() {
                     <p className="text-dtc-muted mb-6">Entre un pseudo pour voir ses états de service.</p>
                     
                     <div className="relative text-left">
-                        <form onSubmit={(e) => { e.preventDefault(); handleSearch(searchQuery); }} className="flex gap-2">
+                        <form onSubmit={(e) => { e.preventDefault(); search(searchQuery); }} className="flex gap-2">
                             <div className="relative flex-1">
                                 <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-dtc-muted w-5 h-5" />
                                 <input 
@@ -121,7 +89,7 @@ function Search() {
                                         {suggestions.map((sug, index) => (
                                             <li key={index}>
                                                 <button
-                                                    onClick={() => handleSearch(sug.fullName)}
+                                                    onClick={() => search(sug.fullName)}
                                                     className="w-full text-left px-4 py-3 hover:bg-slate-800 flex items-center justify-between group transition-colors border-b border-slate-800/50 last:border-0"
                                                 >
                                                     <span className="text-dtc-text font-medium group-hover:text-dtc-accent transition-colors">
@@ -161,6 +129,8 @@ function Search() {
                         triumphScore="Masqué"
                         d1Data={d1Data}
                         d2Data={d2Data}
+                        membershipId={playerInfo.destinyMembershipId} 
+                        membershipType={playerInfo.membershipType}
                     />
                 )}
             </div>

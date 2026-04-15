@@ -1,8 +1,8 @@
-// src/components/Dashboard/CharacterCard.jsx
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
-const CharacterCard = ({ character, delay = 0 }) => {
-    // On associe une couleur Tailwind selon la classe
+const CharacterCard = ({ character, membershipId, membershipType, delay = 0 }) => {
+    const navigate = useNavigate();
     const classColors = {
         "Chasseur": "text-blue-400",
         "Titan": "text-red-400",
@@ -10,14 +10,20 @@ const CharacterCard = ({ character, delay = 0 }) => {
     };
     const color = classColors[character.className] || "text-dtc-text";
 
+    const handleClick = () => {
+        if (membershipId && membershipType) {
+            navigate(`/character/${membershipType}/${membershipId}/${character.characterId}`);
+        }
+    };
+
     return (
         <motion.div
+            onClick={handleClick}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay }}
             className="relative bg-dtc-surface border border-slate-800 hover:border-dtc-accent/50 transition-colors rounded-2xl p-6 flex flex-col justify-between overflow-hidden group"
         >
-            {/* L'image de l'emblème en fond transparent */}
             <div 
                 className="absolute inset-0 bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity z-0"
                 style={{ backgroundImage: `url(${character.emblemImage})` }}

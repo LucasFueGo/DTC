@@ -5,6 +5,7 @@ import Dashboard from '@/components/Dashboard/Dashboard'
 import Auth from '@/components/Auth/Login';
 import Loader from '@/components/ui/Loader';
 import Search from '@/components/Header/Search';
+import CharacterEquipment from '@/components/Character/CharacterEquipment'
 
 function App() {
   const { user, loading } = useContext(Context);
@@ -30,6 +31,10 @@ function App() {
       <Route 
         path="/search" 
         element={user ? <Search /> : <Navigate to="/Auth" />}
+      />
+      <Route 
+        path="/character/:type/:id/:charId" 
+        element={user ? <CharacterEquipment /> : <Navigate to="/Auth" />}
       />
     </Routes>
   )

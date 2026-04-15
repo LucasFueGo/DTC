@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/authRoutes.js';
-import statsRoutes from './routes/statsRoutes.js'
+import statsRoutes from './routes/statsRoutes.js';
+import equipmentRoutes from './routes/equipmentRoutes.js';
 
 dotenv.config();
 
@@ -48,5 +49,6 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/equipment', equipmentRoutes);
 
 export default app;

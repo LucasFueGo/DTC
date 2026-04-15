@@ -45,6 +45,8 @@ function Dashboard() {
                 triumphScore={new Intl.NumberFormat('fr-FR').format(stats.d2?.triumphScore || 0)}
                 d1Data={stats.d1}
                 d2Data={stats.d2}
+                membershipId={user.destinyId}
+                membershipType={user.type}
             />
         </Layout>
     );

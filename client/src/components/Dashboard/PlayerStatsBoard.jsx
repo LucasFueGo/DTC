@@ -5,7 +5,7 @@ import HeroCard from './HeroCard';
 import GameTimeCard from './GameTimeCard';
 import CharacterCard from './CharacterCard';
 
-const PlayerStatsBoard = ({ playerName, triumphScore, d1Data, d2Data }) => {
+const PlayerStatsBoard = ({ playerName, triumphScore, d1Data, d2Data, membershipId, membershipType }) => {
     const [activeTab, setActiveTab] = useState('D2');
 
     const combinedHours = (d1Data?.global?.totalHours || 0) + (d2Data?.global?.totalHours || 0);
@@ -72,6 +72,8 @@ const PlayerStatsBoard = ({ playerName, triumphScore, d1Data, d2Data }) => {
                             <CharacterCard 
                                 key={char.characterId} 
                                 character={char} 
+                                membershipId={membershipId}
+                                membershipType={membershipType}
                                 delay={0.1 * index}
                             />
                         ))
